@@ -36,31 +36,46 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+        align-items: center;
         pointer-events: none; /* Agar area tulisan tidak mengganggu touch */
       }
 
       h1 { color: teal; font-size: 1.5rem; margin: 5px; }
       h2 { color: teal; font-size: 1.2rem; margin: 5px; }
-
-      /* Layout Grid untuk Tombol D-Pad */
-      .control-pad-kanan {
-        display: grid;
-        grid-template-columns: repeat(3, 120px);
-        grid-template-rows: repeat(3, 120px);
-        gap: 8px;
-        padding: 20px;
-        z-index: 10;
-        margin-top: -80px;
+      
+      /* Indikator Status WebSocket */
+      #status {
+        margin-top: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        color: red;
+        background-color: #f0f0f0;
+        padding: 5px 15px;
+        border-radius: 15px;
       }
 
+      /* Layout Grid untuk D-Pad Kiri (Kiri/Kanan) */
       .control-pad-kiri {
         display: grid;
-        grid-template-columns: repeat(3, 120px);
-        grid-template-rows: repeat(3, 120px);
+        /* Ukuran tombol diubah dari 120px ke 100px agar aman di semua layar HP */
+        grid-template-columns: repeat(3, 100px);
+        grid-template-rows: repeat(3, 100px);
         gap: 8px;
         padding: 20px;
         z-index: 10;
         margin-top: 30px;
+      }
+
+      /* Layout Grid untuk D-Pad Kanan (Maju/Mundur) */
+      .control-pad-kanan {
+        display: grid;
+        grid-template-columns: repeat(3, 100px);
+        /* BARIS TENGAH DIKECILKAN MENJADI 40px AGAR TOMBOL MAJU/MUNDUR LEBIH DEKAT */
+        grid-template-rows: 100px 40px 100px; 
+        gap: 8px;
+        padding: 20px;
+        z-index: 10;
+        margin-top: -80px;
       }
 
       /* Desain Tombol */
@@ -72,6 +87,7 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
+        pointer-events: auto; /* Mengaktifkan kembali touch/click pada tombol */
       }
       
       .btn:active {
@@ -79,20 +95,19 @@
         box-shadow: none; 
       }
 
-      /* Area kosong di grid agar letak tombol rapi */
+      /* Area kosong di grid */
       .btn.empty {
-        width: 80px;  /* Atur lebar */
-        height: 80px; /* Atur tinggi */
         background-color: transparent;
         box-shadow: none;
         cursor: default;
+        pointer-events: none; /* Mencegah sentuhan tidak sengaja di area kosong */
       }
       .btn.empty:active {
         transform: none;
       }
 
-      .arrows { font-size: 50px; color: red; }
-      .circularArrows { font-size: 55px; color: blue; }
+      .arrows { font-size: 45px; color: red; }
+      .circularArrows { font-size: 50px; color: blue; }
       
       /* Peringatan jika HP dalam posisi Berdiri (Portrait) */
       @media screen and (orientation: portrait) {
@@ -100,7 +115,7 @@
           content: "Putar HP Anda ke posisi Landscape!";
           color: red;
           font-weight: bold;
-          margin-top: 15px;
+          margin-top: 20px;
         }
       }
     </style>
@@ -124,6 +139,7 @@
     <div class="center-info">
       <h1>Hash Include Electronics</h1>
       <h2>Wi-Fi &#128663; Control</h2>
+      <div id="status">Menghubungkan...</div>
     </div>
 
     <div class="control-pad-kanan" id="rightPad">
@@ -143,26 +159,38 @@
     <script>
       var webSocketUrl = "ws:\/\/" + window.location.hostname + "/ws";
       var websocket;
+      var statusIndicator = document.getElementById("status");
       
       function initWebSocket() 
       {
         websocket = new WebSocket(webSocketUrl);
-        websocket.onopen    = function(event){};
-        websocket.onclose   = function(event){setTimeout(initWebSocket, 2000);};
-        websocket.onmessage = function(event){};
+        
+        websocket.onopen = function(event) {
+          statusIndicator.innerHTML = "Terhubung &#128994;"; // Hijau
+          statusIndicator.style.color = "green";
+        };
+        
+        websocket.onclose = function(event) {
+          statusIndicator.innerHTML = "Terputus &#128308; Mencar ulang..."; // Merah
+          statusIndicator.style.color = "red";
+          setTimeout(initWebSocket, 2000);
+        };
+        
+        websocket.onmessage = function(event) {};
       }
 
       function onTouchStartAndEnd(value) 
       {
-        websocket.send(value);
+        // Pastikan koneksi terbuka sebelum mengirim perintah agar tidak terjadi error
+        if (websocket && websocket.readyState === WebSocket.OPEN) {
+          websocket.send(value);
+        }
       }
           
       window.onload = initWebSocket;
-
-      // Proteksi penuh agar layar tidak ter-drag/zoom saat memencet tombol D-pad
-      document.body.addEventListener("touchend", function(event){
-        event.preventDefault();
-      }, { passive: false });      
+      
+      // Catatan: document.body.addEventListener("touchend", preventDefault) dihapus 
+      // karena 'touch-action: none' di CSS sudah cukup dan lebih aman.
     </script>
     
   </body>
