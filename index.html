@@ -43,7 +43,7 @@
       h2 { color: teal; font-size: 1.2rem; margin: 5px; }
 
       /* Layout Grid untuk Tombol D-Pad */
-      .control-pad {
+      .control-pad-kanan {
         display: grid;
         grid-template-columns: repeat(3, 120px);
         grid-template-rows: repeat(3, 120px);
@@ -51,6 +51,15 @@
         padding: 20px;
         z-index: 10;
         margin-top: -50px;
+      }
+
+      .control-pad-kiri {
+        display: grid;
+        grid-template-columns: repeat(3, 120px);
+        grid-template-rows: repeat(3, 120px);
+        gap: 8px;
+        padding: 20px;
+        z-index: 10;
       }
 
       /* Desain Tombol */
@@ -95,7 +104,7 @@
   </head>
   <body class="noselect">
     
-    <div class="control-pad" id="leftPad">
+    <div class="control-pad-kiri" id="leftPad">
       <div class="btn" ontouchstart='onTouchStartAndEnd("9")' ontouchend='onTouchStartAndEnd("0")'><span class="circularArrows">&#8634;</span></div>
       <div class="btn empty"></div>
       <div class="btn" ontouchstart='onTouchStartAndEnd("10")' ontouchend='onTouchStartAndEnd("0")'><span class="circularArrows">&#8635;</span></div>
@@ -114,7 +123,7 @@
       <h2>Wi-Fi &#128663; Control</h2>
     </div>
 
-    <div class="control-pad" id="rightPad">
+    <div class="control-pad-kanan" id="rightPad">
       <div class="btn" ontouchstart='onTouchStartAndEnd("5")' ontouchend='onTouchStartAndEnd("0")'><span class="arrows">&#11017;</span></div>
       <div class="btn" ontouchstart='onTouchStartAndEnd("1")' ontouchend='onTouchStartAndEnd("0")'><span class="arrows">&#8679;</span></div>
       <div class="btn" ontouchstart='onTouchStartAndEnd("6")' ontouchend='onTouchStartAndEnd("0")'><span class="arrows">&#11016;</span></div>
