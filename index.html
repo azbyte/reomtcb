@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, orientation=landscape">
+    <style>
+      /* Reset & Fullscreen Setup */
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: white;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        touch-action: none; /* Mencegah layar HP scroll atau zoom saat main */
+      }
+      
+      .noselect {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      /* Bagian Judul di Tengah */
+      .center-info {
+        text-align: center;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        pointer-events: none; /* Agar area tulisan tidak mengganggu touch */
+      }
+
+      h1 { color: teal; font-size: 1.5rem; margin: 5px; }
+      h2 { color: teal; font-size: 1.2rem; margin: 5px; }
+
+      /* Layout Grid untuk Tombol D-Pad */
+      .control-pad {
+        display: grid;
+        grid-template-columns: repeat(3, 70px);
+        grid-template-rows: repeat(3, 70px);
+        gap: 8px;
+        padding: 20px;
+        z-index: 10;
+      }
+
+      /* Desain Tombol */
+      .btn {
+        background-color: black;
+        border-radius: 25%;
+        box-shadow: 5px 5px #888888;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+      }
+      
+      .btn:active {
+        transform: translate(5px, 5px);
+        box-shadow: none; 
+      }
+
+      /* Area kosong di grid agar letak tombol rapi */
+      .btn.empty {
+        background-color: transparent;
+        box-shadow: none;
+        cursor: default;
+      }
+      .btn.empty:active {
+        transform: none;
+      }
+
+      .arrows { font-size: 50px; color: red; }
+      .circularArrows { font-size: 55px; color: blue; }
+      
+      /* Peringatan jika HP dalam posisi Berdiri (Portrait) */
+      @media screen and (orientation: portrait) {
+        .center-info::after {
+          content: "Putar HP Anda ke posisi Landscape!";
+          color: red;
+          font-weight: bold;
+          margin-top: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body class="noselect">
+    
+    <div class="control-pad" id="leftPad">
+      <div class="btn" ontouchstart='onTouchStartAndEnd("9")' ontouchend='onTouchStartAndEnd("0")'><span class="circularArrows">&#8634;</span></div>
+      <div class="btn empty"></div>
+      <div class="btn" ontouchstart='onTouchStartAndEnd("10")' ontouchend='onTouchStartAndEnd("0")'><span class="circularArrows">&#8635;</span></div>
+      
+      <div class="btn" ontouchstart='onTouchStartAndEnd("3")' ontouchend='onTouchStartAndEnd("0")'><span class="arrows">&#8678;</span></div>
+      <div class="btn empty"></div>
+      <div class="btn" ontouchstart='onTouchStartAndEnd("4")' ontouchend='onTouchStartAndEnd("0")'><span class="arrows">&#8680;</span></div>
+      
+      <div class="btn empty"></div>
+      <div class="btn empty"></div>
+      <div class="btn empty"></div>
+    </div>
+
+    <div class="center-info">
+      <h1>Hash Include Electronics</h1>
+      <h2>Wi-Fi &#128663; Control</h2>
+    </div>
+
+    <div class="control-pad" id="rightPad">
+      <div class="btn" ontouchstart='onTouchStartAndEnd("5")' ontouchend='onTouchStartAndEnd("0")'><span class="arrows">&#11017;</span></div>
+      <div class="btn" ontouchstart='onTouchStartAndEnd("1")' ontouchend='onTouchStartAndEnd("0")'><span class="arrows">&#8679;</span></div>
+      <div class="btn" ontouchstart='onTouchStartAndEnd("6")' ontouchend='onTouchStartAndEnd("0")'><span class="arrows">&#11016;</span></div>
+      
+      <div class="btn empty"></div>
+      <div class="btn empty"></div>
+      <div class="btn empty"></div>
+      
+      <div class="btn" ontouchstart='onTouchStartAndEnd("7")' ontouchend='onTouchStartAndEnd("0")'><span class="arrows">&#11019;</span></div>
+      <div class="btn" ontouchstart='onTouchStartAndEnd("2")' ontouchend='onTouchStartAndEnd("0")'><span class="arrows">&#8681;</span></div>
+      <div class="btn" ontouchstart='onTouchStartAndEnd("8")' ontouchend='onTouchStartAndEnd("0")'><span class="arrows">&#11018;</span></div>
+    </div>
+
+    <script>
+      var webSocketUrl = "ws:\/\/" + window.location.hostname + "/ws";
+      var websocket;
+      
+      function initWebSocket() 
+      {
+        websocket = new WebSocket(webSocketUrl);
+        websocket.onopen    = function(event){};
+        websocket.onclose   = function(event){setTimeout(initWebSocket, 2000);};
+        websocket.onmessage = function(event){};
+      }
+
+      function onTouchStartAndEnd(value) 
+      {
+        websocket.send(value);
+      }
+          
+      window.onload = initWebSocket;
+
+      // Proteksi penuh agar layar tidak ter-drag/zoom saat memencet tombol D-pad
+      document.body.addEventListener("touchend", function(event){
+        event.preventDefault();
+      }, { passive: false });      
+    </script>
+    
+  </body>
+</html>
